@@ -1,0 +1,23 @@
+﻿@page "/"
+@using System.Net
+@using Newtonsoft.Json
+@using WorkOrganizationPanel.Client.Services
+@using WorkOrganizationPanel.Shared.Dtos  
+@inject NavigationManager navigationManager 
+@inject HttpClient Http
+
+<PageTitle>Strona Główna</PageTitle>
+
+<h1>Hello</h1>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var isLogged = await Http.GetAsync("https://localhost:44355/api/account/userislogged");
+
+        if (isLogged.StatusCode != HttpStatusCode.OK)
+        {
+            navigationManager.NavigateTo("/login");
+        }
+    }
+}

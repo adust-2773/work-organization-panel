@@ -1,0 +1,81 @@
+﻿@page "/register"
+@using System.Net
+@using WorkOrganizationPanel.Shared.Dtos
+@inject NavigationManager navigationManager
+
+<PageTitle>Rejestracja</PageTitle>
+
+
+<EditForm Model="@registerDto" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    Imie: <br/>
+    <InputText id="firstname" @bind-Value="registerDto.Firstname" />
+
+    <br/><br/>
+
+    Nazwisko: <br/>
+    <InputText id="lastname" @bind-Value="registerDto.Lastname" />
+
+    <br/><br/>
+
+    Email: <br/>
+    <InputText id="email" @bind-Value="registerDto.Email" />
+
+    <br/><br/>
+
+    Hasło: <br/>
+    <InputText id="password" @bind-Value="registerDto.Password" />
+
+    <br/><br/>
+     
+    Powtórz hasło: <br/>
+    <InputText id="password2" @bind-Value="registerDto.PasswordRepeat" />
+
+    <br/><br/><br/>
+
+    <button type="submit">Zarejestruj</button>
+
+    @registerInfo
+</EditForm>
+
+@code {
+    private HttpClient Http = new HttpClient();
+    private RegisterDto registerDto = new RegisterDto();
+    private string registerInfo = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isLogged = await Http.GetAsync("https://localhost:44355/api/account/userislogged");
+
+        if (isLogged.StatusCode == HttpStatusCode.OK)
+        {
+            navigationManager.NavigateTo("/");
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        var postJsonContent = new RegisterDto
+            {
+                Firstname = registerDto.Firstname,
+                Lastname = registerDto.Lastname,
+                Email = registerDto.Email,
+                Password = registerDto.Password,
+                PasswordRepeat = registerDto.PasswordRepeat
+            };
+
+        var result = await Http.PostAsJsonAsync("https://localhost:44355/api/account/register", postJsonContent);
+
+        if (result.StatusCode == HttpStatusCode.OK)
+        {
+            registerInfo = "Poprawnie zarejestrowano konto";
+            navigationManager.NavigateTo("/login");
+        }
+        else 
+        {
+            registerInfo = "Sprawdź poprawność danych rejestracji";
+        }
+    }
+}

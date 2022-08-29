@@ -1,0 +1,64 @@
+﻿@page "/login"
+@using System.Net
+@using WorkOrganizationPanel.Shared.Dtos
+@inject NavigationManager navigationManager
+
+<PageTitle>Logowanie</PageTitle>
+
+
+<EditForm Model="@loginDto" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    Email: <br/>
+    <InputText id="email" @bind-Value="loginDto.Email" />
+
+    <br/><br/>
+
+    Hasło: <br/>
+    <InputText id="password" @bind-Value="loginDto.Password" />
+
+    <br/><br/><br/>
+
+    <button type="submit">Zaloguj</button>
+
+    @loginInfo
+</EditForm>
+
+@code {
+    private HttpClient Http = new HttpClient();
+    private LoginDto loginDto = new LoginDto();
+    private string loginInfo = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isLogged = await Http.GetAsync("https://localhost:44355/api/account/userislogged");
+
+        if (isLogged.StatusCode == HttpStatusCode.OK)
+        {
+            navigationManager.NavigateTo("/");
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        var postJsonContent = new LoginDto
+            {
+                Email = loginDto.Email,
+                Password = loginDto.Password
+            };
+
+        var result = await Http.PostAsJsonAsync("https://localhost:44355/api/account/login", postJsonContent);
+
+
+        if (result.StatusCode == HttpStatusCode.OK)
+        {
+            loginInfo = "Poprawnie zalogowano na konto";
+            navigationManager.NavigateTo("/");
+        }
+        else 
+        {
+            loginInfo = "Sprawdź poprawność danych logowania";
+        }
+    }
+}
