@@ -1,1 +1,1 @@
-# WorkOrganizationPanel
+The script is in an early version, it is so far the login panel itself made using the Entity Framework and SQL Server database, after installing the MSQLS environment, you should perform migrations in the website design.
